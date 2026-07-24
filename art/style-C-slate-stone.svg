@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="740" viewBox="0 0 920 740">
+  <defs>
+    <radialGradient id="slate" cx="50%" cy="42%" r="80%">
+      <stop offset="0" stop-color="#3a4048"/><stop offset="1" stop-color="#1a1e24"/>
+    </radialGradient>
+    <radialGradient id="tigC" cx="36%" cy="32%" r="80%">
+      <stop offset="0" stop-color="#ffb347"/><stop offset="0.55" stop-color="#e07a1c"/><stop offset="1" stop-color="#8a4408"/>
+    </radialGradient>
+    <radialGradient id="goatC" cx="36%" cy="32%" r="80%">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#dfe6ec"/><stop offset="1" stop-color="#aab4bd"/>
+    </radialGradient>
+  </defs>
+  <rect width="920" height="740" fill="url(#slate)"/>
+  <g stroke="rgba(255,255,255,.03)" stroke-width="2" fill="none">
+    <path d="M0 120 L920 90 M0 300 L920 330 M0 520 L920 490 M120 0 L90 740 M500 0 L520 740 M800 0 L780 740"/>
+  </g>
+
+  <!-- crisp chalk lines -->
+  <g fill="none" stroke-linecap="round">
+    <g stroke="rgba(0,0,0,.4)" stroke-width="9">
+      <path d="M450 90 L315 250 M450 90 L585 250 M450 90 L450 250 M180 250 H720 M180 430 H720 M315 610 H585 M180 250 V430 M315 250 V430 M450 250 V430 M585 250 V430 M720 250 V430 M315 430 V610 M450 430 V610 M585 430 V610 M180 250 L90 210 M180 250 L90 300 M90 210 L90 300 M720 250 L775 150 M720 250 L830 200 M775 150 L830 200 M720 430 L830 390 M720 430 L830 470 M830 390 L830 470 M180 430 L95 500 M180 430 L150 560 M95 500 L150 560"/>
+    </g>
+    <g stroke="rgba(236,242,248,.92)" stroke-width="4.5">
+      <path d="M450 90 L315 250 M450 90 L585 250 M450 90 L450 250 M180 250 H720 M180 430 H720 M315 610 H585 M180 250 V430 M315 250 V430 M450 250 V430 M585 250 V430 M720 250 V430 M315 430 V610 M450 430 V610 M585 430 V610 M180 250 L90 210 M180 250 L90 300 M90 210 L90 300 M720 250 L775 150 M720 250 L830 200 M775 150 L830 200 M720 430 L830 390 M720 430 L830 470 M830 390 L830 470 M180 430 L95 500 M180 430 L150 560 M95 500 L150 560"/>
+    </g>
+  </g>
+
+  <g fill="rgba(0,0,0,.4)">
+    <ellipse cx="454" cy="102" rx="34" ry="13"/><ellipse cx="319" cy="262" rx="34" ry="13"/><ellipse cx="454" cy="262" rx="34" ry="13"/><ellipse cx="589" cy="262" rx="34" ry="13"/>
+  </g>
+
+  <!-- tigers (amber) -->
+  <g stroke="#fff" stroke-width="2">
+    <circle cx="450" cy="90" r="33" fill="url(#tigC)"/><circle cx="315" cy="250" r="33" fill="url(#tigC)"/><circle cx="450" cy="250" r="33" fill="url(#tigC)"/><circle cx="585" cy="250" r="33" fill="url(#tigC)"/>
+  </g>
+  <g stroke="rgba(90,40,0,.6)" stroke-width="3.5" fill="none" stroke-linecap="round">
+    <path d="M440 68 q10 22 0 44 M450 66 q12 24 0 48 M460 68 q10 22 0 44"/>
+    <path d="M305 228 q10 22 0 44 M315 226 q12 24 0 48 M325 228 q10 22 0 44"/>
+    <path d="M440 228 q10 22 0 44 M450 226 q12 24 0 48 M460 228 q10 22 0 44"/>
+    <path d="M575 228 q10 22 0 44 M585 226 q12 24 0 48 M595 228 q10 22 0 44"/>
+  </g>
+
+  <!-- goats -->
+  <g fill="url(#goatC)" stroke="#7f8a94" stroke-width="1.5">
+    <circle cx="180" cy="250" r="24"/><circle cx="720" cy="250" r="24"/>
+    <circle cx="180" cy="430" r="24"/><circle cx="450" cy="430" r="24"/><circle cx="720" cy="430" r="24"/>
+    <circle cx="315" cy="610" r="24"/><circle cx="585" cy="610" r="24"/>
+    <circle cx="90" cy="300" r="21"/><circle cx="830" cy="200" r="21"/><circle cx="150" cy="560" r="21"/>
+  </g>
+
+  <text x="460" y="710" text-anchor="middle" fill="#e8eef4" font-family="Georgia" font-size="30" font-weight="bold">Style C · Slate &amp; Amber</text>
+</svg>

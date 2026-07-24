@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="760" viewBox="70 90 540 380">
+  <rect x="70" y="90" width="540" height="380" fill="#1b1c1a"/>
+
+  <!-- ===== chalk lines traced from the photo ===== -->
+  <g stroke="#e9e2d2" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.92">
+    <!-- apex triangle -->
+    <path d="M315 110 L235 235 M315 110 L420 235"/>
+    <!-- top horizontal line -->
+    <path d="M120 235 H515"/>
+    <!-- top-left arrow -->
+    <path d="M120 235 L92 212 M92 212 L120 258"/>
+    <!-- top-right little triangle -->
+    <path d="M515 235 L543 162 M543 162 L562 232 M515 235 H562"/>
+    <!-- verticals: top row -> middle row -->
+    <path d="M120 235 V340 M235 235 V340 M315 235 V340 M420 235 V340 M515 235 V340"/>
+    <!-- middle horizontal line -->
+    <path d="M120 340 H515"/>
+    <!-- right-middle arrow (points right) -->
+    <path d="M515 340 L578 306 M515 340 L560 380 M578 306 L560 380"/>
+    <!-- verticals: middle row -> bottom row (narrow, center 3) -->
+    <path d="M235 340 V400 M315 340 V400 M420 340 V400"/>
+    <!-- bottom horizontal line -->
+    <path d="M235 400 H420"/>
+    <!-- bottom-left arrow (points down-left) -->
+    <path d="M120 340 L104 418 M104 418 L146 398"/>
+  </g>
+
+  <!-- ===== nodes (as circled in the photo) ===== -->
+  <g fill="#efe9db" stroke="#8a8172" stroke-width="2">
+    <!-- top row -->
+    <circle cx="120" cy="235" r="9"/><circle cx="235" cy="235" r="9"/><circle cx="315" cy="235" r="9"/><circle cx="420" cy="235" r="9"/><circle cx="515" cy="235" r="9"/>
+    <!-- apex -->
+    <circle cx="315" cy="110" r="9"/>
+    <!-- top tips -->
+    <circle cx="92" cy="212" r="8"/><circle cx="543" cy="162" r="8"/>
+    <!-- middle row -->
+    <circle cx="120" cy="340" r="9"/><circle cx="235" cy="340" r="9"/><circle cx="315" cy="340" r="9"/><circle cx="420" cy="340" r="9"/><circle cx="515" cy="340" r="9"/>
+    <!-- right tips -->
+    <circle cx="578" cy="306" r="8"/><circle cx="560" cy="380" r="8"/>
+    <!-- bottom row -->
+    <circle cx="235" cy="400" r="9"/><circle cx="315" cy="400" r="9"/><circle cx="420" cy="400" r="9"/>
+    <!-- bottom-left tip -->
+    <circle cx="104" cy="418" r="8"/>
+  </g>
+
+  <text x="340" y="455" text-anchor="middle" fill="#f0e6d0" font-family="Georgia" font-size="18">Traced from your photo</text>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1080" viewBox="0 0 1000 1080">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="75%">
+      <stop offset="0" stop-color="#2a2b28"/><stop offset="1" stop-color="#141513"/>
+    </radialGradient>
+  </defs>
+  <rect width="1000" height="1080" fill="url(#bg)"/>
+
+  <!-- ===== board lines (chalk) ===== -->
+  <g stroke="#eee7d6" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.85">
+    <!-- apex spokes to the 3 tiger points -->
+    <path d="M500 180 L375 360 M500 180 L500 360 M500 180 L625 360"/>
+    <!-- grid horizontals -->
+    <path d="M250 360 H750 M250 560 H750 M250 760 H750"/>
+    <!-- grid verticals -->
+    <path d="M250 360 V760 M375 360 V760 M500 360 V760 M625 360 V760 M750 360 V760"/>
+    <!-- outer arrows: connectors to tips -->
+    <path d="M250 360 L150 270 M750 360 L850 270"/>
+    <path d="M250 760 L150 850 M750 760 L850 850"/>
+    <path d="M250 560 L140 560 M750 560 L860 560"/>
+  </g>
+  <!-- arrowheads (identical triangles on every outer tip) -->
+  <g stroke="#eee7d6" stroke-width="5" fill="none" stroke-linejoin="round" opacity="0.85">
+    <path d="M150 270 l55 6 M150 270 l6 55"/>            <!-- TL -->
+    <path d="M850 270 l-55 6 M850 270 l-6 55"/>          <!-- TR -->
+    <path d="M150 850 l55 -6 M150 850 l6 -55"/>          <!-- BL -->
+    <path d="M850 850 l-55 -6 M850 850 l-6 -55"/>        <!-- BR -->
+    <path d="M140 560 l60 -22 M140 560 l60 22"/>         <!-- SL (side, empty) -->
+    <path d="M860 560 l-60 -22 M860 560 l-60 22"/>       <!-- SR (side, empty) -->
+  </g>
+
+  <!-- ===== nodes ===== -->
+  <!-- tigers (4): apex + top-inner-3 -->
+  <g fill="#1c140d" stroke="#e0b06a" stroke-width="3">
+    <circle cx="500" cy="180" r="26"/>
+    <circle cx="375" cy="360" r="26"/>
+    <circle cx="500" cy="360" r="26"/>
+    <circle cx="625" cy="360" r="26"/>
+  </g>
+  <g fill="#e0b06a" font-family="Georgia, serif" font-size="22" text-anchor="middle" font-weight="bold">
+    <text x="500" y="188">T</text><text x="375" y="368">T</text><text x="500" y="368">T</text><text x="625" y="368">T</text>
+  </g>
+
+  <!-- goats (16): white pebbles -->
+  <g fill="#efe9db" stroke="#8a8172" stroke-width="2">
+    <circle cx="250" cy="360" r="22"/><circle cx="750" cy="360" r="22"/>
+    <circle cx="250" cy="560" r="22"/><circle cx="375" cy="560" r="22"/><circle cx="500" cy="560" r="22"/><circle cx="625" cy="560" r="22"/><circle cx="750" cy="560" r="22"/>
+    <circle cx="250" cy="760" r="22"/><circle cx="375" cy="760" r="22"/><circle cx="500" cy="760" r="22"/><circle cx="625" cy="760" r="22"/><circle cx="750" cy="760" r="22"/>
+    <circle cx="150" cy="270" r="20"/><circle cx="850" cy="270" r="20"/>
+    <circle cx="150" cy="850" r="20"/><circle cx="850" cy="850" r="20"/>
+  </g>
+
+  <!-- empty (2): the side tips (pink positions) -->
+  <g fill="none" stroke="#ff9ecb" stroke-width="4" stroke-dasharray="4 5">
+    <circle cx="140" cy="560" r="20"/><circle cx="860" cy="560" r="20"/>
+  </g>
+
+  <!-- legend -->
+  <g font-family="Georgia, serif" font-size="26" fill="#f0e6d0">
+    <text x="500" y="60" text-anchor="middle" font-size="34" font-weight="bold">Puli Meka  22 points</text>
+    <circle cx="150" cy="985" r="16" fill="#1c140d" stroke="#e0b06a" stroke-width="3"/><text x="180" y="993">4 Tigers (fixed: apex + top 3)</text>
+    <circle cx="150" cy="1025" r="16" fill="#efe9db" stroke="#8a8172" stroke-width="2"/><text x="180" y="1033">16 Goats</text>
+    <circle cx="600" cy="1025" r="15" fill="none" stroke="#ff9ecb" stroke-width="4" stroke-dasharray="4 5"/><text x="628" y="1033">2 Empty (side tips)</text>
+  </g>
+</svg>

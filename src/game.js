@@ -302,7 +302,7 @@
     el('resultTitle').textContent = winner === 'G' ? 'Goats Win!' : 'Tigers Win!';
     el('resultText').textContent = winner === 'G'
       ? 'Every tiger is trapped under the old banyan tree.'
-      : 'The tigers feasted — five goats were caught.';
+      : `The tigers feasted — ${B.GOATS_TO_LOSE} goats were caught.`;
     if (G.gameMode === 'pvc') {
       const humanWon = winner === G.humanSide;
       bigToast(humanWon ? 'You Win!' : 'You Lose');
@@ -327,10 +327,11 @@
     });
   }
 
-  let chosenSide = 'G', chosenDiff = 3, chosenMode = 'pvc';
+  let chosenSide = 'G', chosenDiff = 3, chosenMode = 'pvc', chosenStart = 'classic';
   setupChoice('sideGrid', 'data-side', (v) => { chosenSide = v; });
   setupChoice('diffGrid', 'data-diff', (v) => { chosenDiff = parseInt(v, 10); });
   setupChoice('modeGrid', 'data-mode', (v) => { chosenMode = v; refreshModeUI(); });
+  setupChoice('startGrid', 'data-start', (v) => { chosenStart = v; });
 
   function refreshModeUI() {
     // "Play as" only matters when facing the computer.
@@ -348,6 +349,7 @@
     AUDIO.play('wood'); AUDIO.startAmbience();
     G.gameMode = chosenMode;
     G.aiDepth = Math.max(2, chosenDiff);
+    B.TIGER_START = (B.TIGER_START_PRESETS[chosenStart] || B.TIGER_START_PRESETS.classic).slice();
     if (chosenMode === 'pvc') {
       G.humanSide = chosenSide;
       G.players = {}; G.players[chosenSide] = 'human'; G.players[other(chosenSide)] = 'ai';

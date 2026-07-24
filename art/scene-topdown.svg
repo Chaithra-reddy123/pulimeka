@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <filter id="mud" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="4" seed="7" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.14  0 0 0 0 0.12  0 0 0 0.9 0" result="c"/>
+      <feComposite in="c" in2="SourceGraphic" operator="over"/>
+    </filter>
+    <filter id="stoneTex">
+      <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="3" seed="11" result="n"/>
+      <feDiffuseLighting in="n" lighting-color="#ffffff" surfaceScale="1.4" diffuseConstant="1" result="l">
+        <feDistantLight azimuth="235" elevation="55"/>
+      </feDiffuseLighting>
+      <feComposite in="l" in2="SourceGraphic" operator="in" result="li"/>
+      <feBlend in="SourceGraphic" in2="li" mode="multiply"/>
+    </filter>
+    <radialGradient id="pebble" cx="38%" cy="34%" r="75%">
+      <stop offset="0" stop-color="#fbf6ec"/><stop offset="55%" stop-color="#e4dccb"/><stop offset="1" stop-color="#b8ad95"/>
+    </radialGradient>
+    <radialGradient id="pebble2" cx="40%" cy="36%" r="75%">
+      <stop offset="0" stop-color="#efe4d0"/><stop offset="60%" stop-color="#cbb790"/><stop offset="1" stop-color="#96794d"/>
+    </radialGradient>
+    <radialGradient id="tiger" cx="38%" cy="32%" r="80%">
+      <stop offset="0" stop-color="#5f4f40"/><stop offset="55%" stop-color="#2b221a"/><stop offset="1" stop-color="#0f0a06"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+    <radialGradient id="vig" cx="50%" cy="45%" r="72%">
+      <stop offset="0.5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.55"/>
+    </radialGradient>
+  </defs>
+
+  <!-- dark packed-earth ground (like the photo) -->
+  <rect width="1000" height="1000" fill="#20211f"/>
+  <rect width="1000" height="1000" filter="url(#mud)" opacity="0.95"/>
+
+  <!-- ===== chalk board: 22 points ===== -->
+  <!-- points:
+       apex (500,175)
+       row1 y=430: L1 250, a 375, b 500, c 625, R1 750   (tigers on 375/500/625)
+       row2 y=605: 250 375 500 625 750
+       row3 y=780: 250 375 500 625 750
+       side tips (empty): left (150,605), right (850,605)
+       corner arrows: TL(160,300) TR(840,300) BL(160,900) BR(840,900) -> goats -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- shadow pass -->
+    <g stroke="#000" stroke-opacity="0.5" stroke-width="12" transform="translate(3,4)">
+      <path d="M500 175 L375 430 M500 175 L500 430 M500 175 L625 430"/>
+      <path d="M250 430 H750 M250 605 H750 M250 780 H750"/>
+      <path d="M250 430 V780 M375 430 V780 M500 430 V780 M625 430 V780 M750 430 V780"/>
+      <path d="M250 430 L150 605 L250 780 M150 605 H250"/>
+      <path d="M750 430 L850 605 L750 780 M850 605 H750"/>
+      <path d="M250 430 L160 300 M375 430 L160 300 M750 430 L840 300 M625 430 L840 300"/>
+      <path d="M250 780 L160 900 M375 780 L160 900 M750 780 L840 900 M625 780 L840 900"/>
+    </g>
+    <!-- chalk pass -->
+    <g stroke="#eee7d6" stroke-opacity="0.92" stroke-width="6">
+      <path d="M500 175 L375 430 M500 175 L500 430 M500 175 L625 430"/>
+      <path d="M250 430 H750 M250 605 H750 M250 780 H750"/>
+      <path d="M250 430 V780 M375 430 V780 M500 430 V780 M625 430 V780 M750 430 V780"/>
+      <path d="M250 430 L150 605 L250 780 M150 605 H250"/>
+      <path d="M750 430 L850 605 L750 780 M850 605 H750"/>
+      <path d="M250 430 L160 300 M375 430 L160 300 M750 430 L840 300 M625 430 L840 300"/>
+      <path d="M250 780 L160 900 M375 780 L160 900 M750 780 L840 900 M625 780 L840 900"/>
+    </g>
+  </g>
+
+  <!-- ===== 16 goats (pebbles) ===== -->
+  <g>
+    <!-- row1 ends -->
+    <use href="#g" x="0"/>
+  </g>
+  <g id="goats">
+    <!-- macro via explicit ellipses: shadow + stone -->
+    <g><ellipse cx="256" cy="441" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="250" cy="430" rx="31" ry="25" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="756" cy="441" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="750" cy="430" rx="30" ry="24" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <!-- row2 -->
+    <g><ellipse cx="256" cy="616" rx="34" ry="27" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="250" cy="605" rx="32" ry="26" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="381" cy="616" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="375" cy="605" rx="30" ry="25" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="506" cy="616" rx="34" ry="27" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="500" cy="605" rx="32" ry="26" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="631" cy="616" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="625" cy="605" rx="30" ry="25" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="756" cy="616" rx="34" ry="27" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="750" cy="605" rx="32" ry="26" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <!-- row3 -->
+    <g><ellipse cx="256" cy="791" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="250" cy="780" rx="31" ry="25" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="381" cy="791" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="375" cy="780" rx="30" ry="25" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="506" cy="791" rx="34" ry="27" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="500" cy="780" rx="32" ry="26" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="631" cy="791" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="625" cy="780" rx="30" ry="25" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="756" cy="791" rx="33" ry="26" fill="#000" opacity="0.45" filter="url(#soft)"/><ellipse cx="750" cy="780" rx="31" ry="25" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <!-- 4 corner arrow tips -->
+    <g><ellipse cx="166" cy="311" rx="31" ry="24" fill="#000" opacity="0.4" filter="url(#soft)"/><ellipse cx="160" cy="300" rx="28" ry="23" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="846" cy="311" rx="31" ry="24" fill="#000" opacity="0.4" filter="url(#soft)"/><ellipse cx="840" cy="300" rx="28" ry="23" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="166" cy="911" rx="31" ry="24" fill="#000" opacity="0.4" filter="url(#soft)"/><ellipse cx="160" cy="900" rx="28" ry="23" fill="url(#pebble2)" filter="url(#stoneTex)"/></g>
+    <g><ellipse cx="846" cy="911" rx="31" ry="24" fill="#000" opacity="0.4" filter="url(#soft)"/><ellipse cx="840" cy="900" rx="28" ry="23" fill="url(#pebble)" filter="url(#stoneTex)"/></g>
+  </g>
+
+  <!-- the 2 empty points (side tips) get a faint chalk ring -->
+  <g stroke="#eee7d6" stroke-opacity="0.5" stroke-width="3" fill="none">
+    <circle cx="150" cy="605" r="18"/><circle cx="850" cy="605" r="18"/>
+  </g>
+
+  <!-- ===== 4 tigers (dark engraved stones, fixed) ===== -->
+  <g>
+    <g><ellipse cx="508" cy="190" rx="44" ry="33" fill="#000" opacity="0.5" filter="url(#soft)"/>
+       <ellipse cx="500" cy="175" rx="42" ry="33" fill="url(#tiger)" filter="url(#stoneTex)"/>
+       <g stroke="#000" stroke-opacity="0.5" stroke-width="6" fill="none" stroke-linecap="round">
+         <path d="M478 148 q12 27 0 54"/><path d="M500 145 q12 30 0 60"/><path d="M522 148 q12 27 0 54"/></g></g>
+    <g><ellipse cx="383" cy="443" rx="42" ry="32" fill="#000" opacity="0.5" filter="url(#soft)"/>
+       <ellipse cx="375" cy="430" rx="40" ry="32" fill="url(#tiger)" filter="url(#stoneTex)"/>
+       <g stroke="#000" stroke-opacity="0.5" stroke-width="6" fill="none" stroke-linecap="round">
+         <path d="M355 405 q12 25 0 50"/><path d="M375 402 q12 28 0 56"/><path d="M395 405 q12 25 0 50"/></g></g>
+    <g><ellipse cx="508" cy="443" rx="42" ry="32" fill="#000" opacity="0.5" filter="url(#soft)"/>
+       <ellipse cx="500" cy="430" rx="40" ry="32" fill="url(#tiger)" filter="url(#stoneTex)"/>
+       <g stroke="#000" stroke-opacity="0.5" stroke-width="6" fill="none" stroke-linecap="round">
+         <path d="M480 405 q12 25 0 50"/><path d="M500 402 q12 28 0 56"/><path d="M520 405 q12 25 0 50"/></g></g>
+    <g><ellipse cx="633" cy="443" rx="42" ry="32" fill="#000" opacity="0.5" filter="url(#soft)"/>
+       <ellipse cx="625" cy="430" rx="40" ry="32" fill="url(#tiger)" filter="url(#stoneTex)"/>
+       <g stroke="#000" stroke-opacity="0.5" stroke-width="6" fill="none" stroke-linecap="round">
+         <path d="M605 405 q12 25 0 50"/><path d="M625 402 q12 28 0 56"/><path d="M645 405 q12 25 0 50"/></g></g>
+  </g>
+
+  <rect width="1000" height="1000" fill="url(#vig)"/>
+</svg>

@@ -73,6 +73,60 @@ cd android && ./gradlew assembleDebug
 > `./gradlew assembleRelease` / `bundleRelease` after configuring signing in
 > `android/app/build.gradle`.
 
+### Option D — Signed release for Google Play (`.aab`)
+Google Play needs a **signed release App Bundle (`.aab`)**. The workflow
+`.github/workflows/android-release.yml` builds one for you in the cloud.
+
+**1. Create an upload keystore** (needs a JDK's `keytool` locally, or use any machine
+that has Java):
+
+```bash
+keytool -genkeypair -v -keystore upload-keystore.jks -alias upload \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Remember the **store password**, **alias** (`upload`), and **key password**.
+
+**2. Base64‑encode the keystore** so it can live in a secret:
+
+```powershell
+# PowerShell (Windows)
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("upload-keystore.jks")) > keystore.b64.txt
+```
+
+```bash
+# macOS / Linux
+base64 -w0 upload-keystore.jks > keystore.b64.txt
+```
+
+**3. Add 4 repository secrets** — GitHub repo → **Settings → Secrets and variables →
+Actions → New repository secret**:
+
+| Secret name | Value |
+|-------------|-------|
+| `ANDROID_KEYSTORE_BASE64` | contents of `keystore.b64.txt` |
+| `ANDROID_KEYSTORE_PASSWORD` | your store password |
+| `ANDROID_KEY_ALIAS` | `upload` |
+| `ANDROID_KEY_PASSWORD` | your key password |
+
+> Secrets are encrypted and never shown in logs — safe even on a public repo.
+> **Keep `upload-keystore.jks` backed up privately; never commit it.**
+
+**4. Run the workflow:** Actions → **Build Signed Release (Play Store)** → **Run
+workflow** → enter a version name (e.g. `1.0.0`) → Run. Download the
+**`pulimeka-release-aab`** artifact → that's `app-release.aab`.
+
+**5. Upload to Google Play:**
+- One‑time: create a [Google Play Console](https://play.google.com/console) developer
+  account ($25), create the app, fill store listing, content rating, privacy policy,
+  and data‑safety form.
+- Use **Play App Signing** (recommended): upload your `.aab`; Google manages the final
+  signing key while your keystore is the *upload* key.
+- Create a **Production** (or Internal testing) release → upload `app-release.aab` → roll out.
+
+Each cloud run auto‑increments `versionCode` (from the run number); bump the
+**version name** input for each Play release.
+
 ---
 
 ## How to play

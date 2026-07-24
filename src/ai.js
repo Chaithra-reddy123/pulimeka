@@ -8,15 +8,13 @@
   const E = window.ENGINE;
   const WIN = 1e6;
 
-  // Central points are stronger for tigers (mobility) and dangerous
-  // for lone goats. Precompute a small positional weight.
+  // Well-connected, central points are stronger for tigers (more
+  // mobility) and more dangerous for lone goats. Use each node's
+  // connection count as a topology-agnostic positional weight:
+  // hubs (degree 4) score high, dead-end triangle tips (degree 2) low.
   const CENTER = (() => {
     const w = new Array(B.COUNT);
-    for (let i = 0; i < B.COUNT; i++) {
-      const r = B.rowOf(i), c = B.colOf(i);
-      const dr = Math.abs(r - 2), dc = Math.abs(c - 2);
-      w[i] = (4 - dr - dc); // 4 at centre, 0 at corners
-    }
+    for (let i = 0; i < B.COUNT; i++) w[i] = B.ADJ[i].length;
     return w;
   })();
 

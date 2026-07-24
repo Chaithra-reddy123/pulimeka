@@ -1,0 +1,92 @@
+name: Build Signed Release (Play Store)
+
+# Produces a SIGNED release .aab (for Google Play) and a signed .apk (for
+# sideloading). Requires 4 repository secrets:
+#   ANDROID_KEYSTORE_BASE64   - your upload keystore (.jks), base64-encoded
+#   ANDROID_KEYSTORE_PASSWORD - the keystore (store) password
+#   ANDROID_KEY_ALIAS         - the key alias (e.g. "upload")
+#   ANDROID_KEY_PASSWORD      - the key password
+# Trigger it manually from the Actions tab (Run workflow) and set the version.
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Version name (e.g. 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          check-latest: true
+
+      - name: Set up Java (for Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Assemble web assets into www/
+        run: |
+          rm -rf www && mkdir -p www
+          cp -r index.html manifest.webmanifest sw.js icon.svg src www/
+
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync web assets to Android
+        run: npx cap sync android
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+          ls -l android/app/upload-keystore.jks
+
+      - name: Inject release signing config
+        env:
+          ANDROID_VERSION_CODE: ${{ github.run_number }}
+          ANDROID_VERSION_NAME: ${{ github.event.inputs.versionName }}
+        run: node scripts/android-signing.js
+
+      - name: Build signed AAB and APK
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/android/app/upload-keystore.jks
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease --no-daemon \
+            -Dorg.gradle.java.home="$JAVA_HOME"
+
+      - name: Upload Play Store bundle (.aab)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulimeka-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulimeka-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: warn

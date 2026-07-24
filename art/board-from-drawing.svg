@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="720" viewBox="0 0 1000 720">
+  <rect width="1000" height="720" fill="#1b1c1a"/>
+
+  <!-- ==== lines ==== -->
+  <g stroke="#e9e2d2" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9">
+    <!-- apex triangle -->
+    <path d="M430 90 L300 250 M430 90 L560 250"/>
+    <!-- top horizontal -->
+    <path d="M160 250 H680"/>
+    <!-- mid horizontal -->
+    <path d="M150 420 H680"/>
+    <!-- bottom horizontal (narrow) -->
+    <path d="M300 580 H560"/>
+    <!-- verticals -->
+    <path d="M160 250 V420 M300 250 V580 M430 250 V580 M560 250 V580 M680 250 V420"/>
+    <!-- arrow connectors -->
+    <path d="M160 250 L80 250"/>     <!-- to TL tip -->
+    <path d="M680 250 L740 175"/>    <!-- to TR tip -->
+    <path d="M680 420 L760 420"/>    <!-- to MR tip -->
+    <path d="M150 420 L85 560"/>     <!-- to BL tip -->
+  </g>
+  <!-- arrowheads (triangles) -->
+  <g stroke="#e9e2d2" stroke-width="4" fill="none" stroke-linejoin="round" opacity="0.9">
+    <path d="M80 250 l55 -16 M80 250 l55 16"/>
+    <path d="M740 175 l-8 55 M740 175 l45 30"/>
+    <path d="M760 420 l-55 -16 M760 420 l-55 16"/>
+    <path d="M85 560 l60 -6 M85 560 l14 -52"/>
+  </g>
+
+  <!-- ==== nodes ==== -->
+  <!-- tigers (dark) : apex + top inner 3 -->
+  <g fill="#1c140d" stroke="#e0b06a" stroke-width="3">
+    <circle cx="430" cy="90" r="22"/>
+    <circle cx="300" cy="250" r="22"/>
+    <circle cx="430" cy="250" r="22"/>
+    <circle cx="560" cy="250" r="22"/>
+  </g>
+  <g fill="#e0b06a" font-family="Georgia" font-size="18" text-anchor="middle" font-weight="bold">
+    <text x="430" y="96">T</text><text x="300" y="256">T</text><text x="430" y="256">T</text><text x="560" y="256">T</text>
+  </g>
+
+  <!-- other points (white) -->
+  <g fill="#efe9db" stroke="#8a8172" stroke-width="2">
+    <circle cx="160" cy="250" r="18"/><circle cx="680" cy="250" r="18"/>
+    <circle cx="150" cy="420" r="18"/><circle cx="300" cy="420" r="18"/><circle cx="430" cy="420" r="18"/><circle cx="560" cy="420" r="18"/><circle cx="680" cy="420" r="18"/>
+    <circle cx="300" cy="580" r="18"/><circle cx="430" cy="580" r="18"/><circle cx="560" cy="580" r="18"/>
+    <circle cx="80" cy="250" r="16"/><circle cx="740" cy="175" r="16"/><circle cx="760" cy="420" r="16"/><circle cx="85" cy="560" r="16"/>
+  </g>
+
+
+  <text x="500" y="695" text-anchor="middle" fill="#f0e6d0" font-family="Georgia" font-size="24">As I read it: 18 points ù 4 tigers (T) + 14 other points</text>
+</svg>

@@ -16,19 +16,33 @@
     return x - Math.floor(x);
   }
 
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
   function computeLayout(w, h) {
     const portrait = h >= w;
-    // Board sits in the lower-centre of the screen.
+    // Board sits in the lower-centre of the screen. It is wider than
+    // it is tall, so fit it by width and derive the height from the
+    // board's real aspect ratio (keeps the drawing undistorted).
     const cx = w * 0.5;
-    const halfW = Math.min(w * (portrait ? 0.40 : 0.30), h * 0.34);
+    const boardW = Math.min(w * (portrait ? 0.90 : 0.60), (h * 0.5) / B.ASPECT);
+    const halfW = boardW / 2;
+    const boardH = boardW * B.ASPECT;
     const boardTop = h * (portrait ? 0.40 : 0.34);
-    const boardBottom = h * (portrait ? 0.82 : 0.86);
-    const backScale = 0.66;
-    const unit = (halfW * 2) / (B.SIZE - 1);
+    const boardBottom = boardTop + boardH;
+    const backScale = 0.82;
+    const unit = boardW * B.UNIT_N;
     layout = {
-      w, h, cx, halfW, boardTop, boardBottom, backScale, unit,
+      w, h, cx, halfW, boardTop, boardBottom, boardH, backScale, unit,
       horizon: h * (portrait ? 0.30 : 0.24),
-      pieceR: unit * 0.30,
+      pieceR: unit * 0.34,
     };
 
     // Precompute chalk wobble
@@ -58,7 +72,7 @@
   function project(bx, by) {
     const persp = layout.backScale + (1 - layout.backScale) * by;
     const x = layout.cx + (bx - 0.5) * layout.halfW * 2 * persp;
-    const y = layout.boardTop + (layout.boardBottom - layout.boardTop) * Math.pow(by, 1.05);
+    const y = layout.boardTop + layout.boardH * Math.pow(by, 1.02);
     return { x, y, s: persp };
   }
 
@@ -77,19 +91,50 @@
   }
 
   /* ---------------- board chalk ---------------- */
-  function drawBoard(ctx, view) {
-    // faint worn oval where the board has been rubbed on the mud
-    const cTop = project(0.5, 0), cBot = project(0.5, 1);
+  function drawSlate(ctx) {
+    // bounding box of all nodes on screen
+    let minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+    for (let i = 0; i < B.COUNT; i++) {
+      const p = nodeScreen(i);
+      if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
+    }
+    const pad = layout.pieceR * 2.1;
+    const x0 = minX - pad, y0 = minY - pad;
+    const rw = (maxX + pad) - x0, rh = (maxY + pad) - y0;
+    const rad = Math.min(rw, rh) * 0.09;
+
     ctx.save();
-    ctx.globalAlpha = 0.10;
-    const g = ctx.createRadialGradient(layout.cx, (cTop.y + cBot.y) / 2, layout.unit,
-      layout.cx, (cTop.y + cBot.y) / 2, layout.halfW * 2.1);
-    g.addColorStop(0, '#e9dcc0'); g.addColorStop(1, 'rgba(233,220,192,0)');
+    // drop shadow onto the ground
+    ctx.fillStyle = 'rgba(0,0,0,.4)';
+    roundRect(ctx, x0 + 10, y0 + 18, rw, rh, rad); ctx.fill();
+    // slate body
+    const g = ctx.createLinearGradient(0, y0, 0, y0 + rh);
+    g.addColorStop(0, '#454c56'); g.addColorStop(0.5, '#2c323a'); g.addColorStop(1, '#191d23');
     ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.ellipse(layout.cx, (cTop.y + cBot.y) / 2, layout.halfW * 1.7, (cBot.y - cTop.y) * 0.78, 0, 0, 7);
-    ctx.fill();
+    roundRect(ctx, x0, y0, rw, rh, rad); ctx.fill();
+    // marble veins
+    ctx.save();
+    roundRect(ctx, x0, y0, rw, rh, rad); ctx.clip();
+    ctx.globalAlpha = 0.07; ctx.strokeStyle = '#cfd8e2'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    for (let k = 0; k < 6; k++) {
+      const yy = y0 + rh * (k + 0.5) / 6;
+      ctx.beginPath();
+      ctx.moveTo(x0, yy + Math.sin(k * 1.7) * 12);
+      ctx.bezierCurveTo(x0 + rw * 0.33, yy - 16, x0 + rw * 0.66, yy + 16, x0 + rw, yy + Math.cos(k) * 12);
+      ctx.stroke();
+    }
     ctx.restore();
+    // bevel: bright top edge, dark bottom edge
+    ctx.strokeStyle = 'rgba(255,255,255,.13)'; ctx.lineWidth = 3;
+    roundRect(ctx, x0 + 2, y0 + 2, rw - 4, rh - 4, rad); ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 2;
+    roundRect(ctx, x0, y0, rw, rh, rad); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawBoard(ctx, view) {
+    drawSlate(ctx);
 
     // chalk lines
     ctx.save();
@@ -98,8 +143,8 @@
       const [a, b] = B.EDGES[i];
       const pa = nodeScreen(a), pb = nodeScreen(b);
       const w = edgeWobble[i];
-      const jitter = layout.unit * 0.05;
-      // double stroke: soft shadow then bright chalk for a dusty look
+      const jitter = layout.unit * 0.04;
+      // double stroke: dark groove then bright cool-white chalk
       for (let pass = 0; pass < 2; pass++) {
         ctx.beginPath();
         for (let k = 0; k <= 6; k++) {
@@ -108,8 +153,8 @@
           const y = pa.y + (pb.y - pa.y) * tt + w[k][1] * jitter;
           if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
-        if (pass === 0) { ctx.strokeStyle = 'rgba(60,44,22,.28)'; ctx.lineWidth = layout.unit * 0.14; }
-        else { ctx.strokeStyle = 'rgba(247,243,232,.82)'; ctx.lineWidth = layout.unit * 0.075; }
+        if (pass === 0) { ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = layout.unit * 0.13; }
+        else { ctx.strokeStyle = 'rgba(236,242,248,.95)'; ctx.lineWidth = layout.unit * 0.07; }
         ctx.stroke();
       }
     }
@@ -117,7 +162,7 @@
     for (let i = 0; i < B.COUNT; i++) {
       const p = nodeScreen(i);
       ctx.beginPath();
-      ctx.fillStyle = 'rgba(247,243,232,.9)';
+      ctx.fillStyle = 'rgba(236,242,248,.92)';
       ctx.arc(p.x, p.y, layout.unit * 0.055 * p.s + 1, 0, 7);
       ctx.fill();
     }
@@ -173,10 +218,10 @@
     ctx.rotate(seed.rot);
     ctx.scale(1, seed.squash);
     const g = ctx.createRadialGradient(-R * 0.35, -R * 0.4, R * 0.1, 0, 0, R * 1.1);
-    const warm = 6 * seed.tint;
-    g.addColorStop(0, '#fffdf6');
-    g.addColorStop(0.55, `rgb(${236 - warm},${230 - warm},${214 - warm})`);
-    g.addColorStop(1, `rgb(${196 - warm},${186 - warm},${166 - warm})`);
+    const cool = 6 * seed.tint;
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.55, `rgb(${223 - cool},${230 - cool},${236 - cool})`);
+    g.addColorStop(1, `rgb(${166 - cool},${178 - cool},${189 - cool})`);
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
     // subtle speckles + top gloss
@@ -184,7 +229,7 @@
     ctx.fillStyle = 'rgba(255,255,255,.9)';
     ctx.beginPath(); ctx.ellipse(-R * 0.32, -R * 0.42, R * 0.34, R * 0.2, -0.5, 0, 7); ctx.fill();
     ctx.globalAlpha = 0.16;
-    ctx.fillStyle = '#7c6b4c';
+    ctx.fillStyle = '#5c6672';
     for (let k = 0; k < 3; k++) {
       const a = seed.tint * 6 + k * 2.1;
       ctx.beginPath();
@@ -201,9 +246,9 @@
     ctx.rotate(seed.rot * 0.5);
     ctx.scale(1, 0.84);
     const g = ctx.createRadialGradient(-R * 0.4, -R * 0.5, R * 0.1, 0, 0, R * 1.15);
-    g.addColorStop(0, '#5a4a3c');
-    g.addColorStop(0.5, '#2c231b');
-    g.addColorStop(1, '#120c07');
+    g.addColorStop(0, '#ffc85f');
+    g.addColorStop(0.5, '#e17c1d');
+    g.addColorStop(1, '#8a4408');
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
 
@@ -214,13 +259,13 @@
     for (let k = -2; k <= 2; k++) {
       const off = k * R * 0.34;
       // dark groove
-      ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = R * 0.13;
+      ctx.strokeStyle = 'rgba(90,38,0,.6)'; ctx.lineWidth = R * 0.13;
       ctx.beginPath();
       ctx.moveTo(off - R * 0.1, -R);
       ctx.quadraticCurveTo(off + R * 0.28, 0, off - R * 0.1, R);
       ctx.stroke();
-      // warm highlight edge of the groove
-      ctx.strokeStyle = 'rgba(206,150,70,.28)'; ctx.lineWidth = R * 0.05;
+      // bright highlight edge of the groove
+      ctx.strokeStyle = 'rgba(255,224,150,.4)'; ctx.lineWidth = R * 0.05;
       ctx.beginPath();
       ctx.moveTo(off - R * 0.02, -R);
       ctx.quadraticCurveTo(off + R * 0.36, 0, off - R * 0.02, R);
@@ -229,8 +274,8 @@
     ctx.restore();
 
     // polished gloss
-    ctx.globalAlpha = 0.35;
-    ctx.fillStyle = 'rgba(255,240,210,.9)';
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = 'rgba(255,245,220,.95)';
     ctx.beginPath(); ctx.ellipse(-R * 0.38, -R * 0.46, R * 0.34, R * 0.16, -0.5, 0, 7); ctx.fill();
     ctx.restore();
   }
