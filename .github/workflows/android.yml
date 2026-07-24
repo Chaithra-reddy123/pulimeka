@@ -31,6 +31,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Show Java version & JAVA_HOME
+        run: |
+          java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -54,7 +59,9 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleDebug --no-daemon \
+            -Dorg.gradle.java.home="$JAVA_HOME" \
+            -Porg.gradle.java.installations.auto-download=false
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
