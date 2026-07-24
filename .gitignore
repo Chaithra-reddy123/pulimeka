@@ -1,0 +1,10 @@
+# Node / Capacitor build artifacts (generated locally or in CI)
+node_modules/
+package-lock.json
+www/
+android/
+ios/
+*.apk
+*.aab
+check.txt
+.DS_Store

@@ -1,0 +1,60 @@
+name: Build Android APK
+
+# Builds a debug .apk in the cloud so you don't need Android Studio / a local
+# toolchain. Trigger it manually from the Actions tab (workflow_dispatch) or by
+# pushing to main/master. Download the APK from the run's "Artifacts" section.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Java (for Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Assemble web assets into www/
+        run: |
+          rm -rf www && mkdir -p www
+          cp -r index.html manifest.webmanifest sw.js icon.svg src www/
+
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync web assets to Android
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulimeka-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error

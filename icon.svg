@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c9903f"/>
+      <stop offset="1" stop-color="#8a5a2b"/>
+    </linearGradient>
+    <radialGradient id="tiger" cx="40%" cy="35%" r="75%">
+      <stop offset="0" stop-color="#5a4a3c"/>
+      <stop offset="55%" stop-color="#2c231b"/>
+      <stop offset="1" stop-color="#120c07"/>
+    </radialGradient>
+    <radialGradient id="pebble" cx="38%" cy="35%" r="80%">
+      <stop offset="0" stop-color="#fffdf6"/>
+      <stop offset="60%" stop-color="#e7e0cf"/>
+      <stop offset="1" stop-color="#c3bba6"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6f9838"/>
+      <stop offset="1" stop-color="#3c561d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded background (maskable-safe padding) -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- banyan canopy -->
+  <g fill="url(#leaf)">
+    <ellipse cx="256" cy="150" rx="200" ry="70"/>
+    <circle cx="120" cy="150" r="52"/>
+    <circle cx="200" cy="130" r="60"/>
+    <circle cx="300" cy="128" r="62"/>
+    <circle cx="392" cy="152" r="52"/>
+  </g>
+  <!-- trunk -->
+  <path d="M236 158 q-14 120 -34 190 l60 0 q-6 -100 8 -190 z" fill="#5f3c18"/>
+  <path d="M276 158 q14 120 34 190 l-60 0 q6 -100 -8 -190 z" fill="#6b4a24"/>
+
+  <!-- chalk ground line -->
+  <line x1="96" y1="360" x2="416" y2="360" stroke="#f7f3e8" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- goat pebble -->
+  <ellipse cx="176" cy="392" rx="46" ry="40" fill="url(#pebble)"/>
+  <ellipse cx="162" cy="378" rx="16" ry="10" fill="#ffffff" opacity="0.7"/>
+
+  <!-- tiger stone with engraved stripes -->
+  <g>
+    <ellipse cx="332" cy="388" rx="62" ry="52" fill="url(#tiger)"/>
+    <g stroke="#000" stroke-opacity="0.55" stroke-width="9" fill="none" stroke-linecap="round">
+      <path d="M300 344 q18 44 0 88"/>
+      <path d="M332 340 q18 48 0 96"/>
+      <path d="M364 344 q18 44 0 88"/>
+    </g>
+    <ellipse cx="312" cy="368" rx="18" ry="9" fill="#fff0d2" opacity="0.35"/>
+  </g>
+</svg>

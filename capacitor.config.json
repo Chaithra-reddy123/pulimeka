@@ -1,0 +1,9 @@
+{
+  "appId": "com.village.pulimeka",
+  "appName": "Puli Meka",
+  "webDir": "www",
+  "backgroundColor": "#2a2013",
+  "android": {
+    "allowMixedContent": false
+  }
+}
