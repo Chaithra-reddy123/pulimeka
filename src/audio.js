@@ -57,8 +57,9 @@
 
   function scheduleBirds() {
     clearTimeout(birdTimer);
-    const next = 1500 + Math.random() * 4000;
-    birdTimer = setTimeout(() => { if (started) chirp(); scheduleBirds(); }, next);
+    // chirp often so the village always feels alive
+    const next = 900 + Math.random() * 2400;
+    birdTimer = setTimeout(() => { if (started) { chirp(); if (Math.random() > 0.6) setTimeout(chirp, 220 + Math.random() * 300); } scheduleBirds(); }, next);
   }
   function scheduleCows() {
     clearTimeout(cowTimer);
@@ -79,7 +80,7 @@
       o.frequency.setValueAtTime(f, tt);
       o.frequency.linearRampToValueAtTime(f * 1.25, tt + 0.04);
       g.gain.setValueAtTime(0, tt);
-      g.gain.linearRampToValueAtTime(0.06, tt + 0.01);
+      g.gain.linearRampToValueAtTime(0.10, tt + 0.01);
       g.gain.exponentialRampToValueAtTime(0.001, tt + 0.09);
       tt += 0.11 + Math.random() * 0.06;
     }

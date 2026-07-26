@@ -32,17 +32,24 @@
     // it is tall, so fit it by width and derive the height from the
     // board's real aspect ratio (keeps the drawing undistorted).
     const cx = w * 0.5;
-    const boardW = Math.min(w * (portrait ? 0.90 : 0.60), (h * 0.5) / B.ASPECT);
+    // How big a piece is relative to the board width (used to keep the
+    // outermost triangle tips + their pieces fully on-screen).
+    const kPiece = B.UNIT_N * 0.29;
+    // Desired size, then clamped so nothing (point OR the piece drawn on
+    // it) can ever spill off the left/right edge — that was what made the
+    // corner tips impossible to tap before.
+    let boardW = Math.min(w * (portrait ? 0.94 : 0.66), (h * (portrait ? 0.56 : 0.54)) / B.ASPECT);
+    boardW = Math.min(boardW, (w / 2 - 8) / (0.5 + kPiece));
     const halfW = boardW / 2;
     const boardH = boardW * B.ASPECT;
-    const boardTop = h * (portrait ? 0.40 : 0.34);
+    const boardTop = h * (portrait ? 0.35 : 0.30);
     const boardBottom = boardTop + boardH;
-    const backScale = 0.82;
+    const backScale = 0.86;
     const unit = boardW * B.UNIT_N;
     layout = {
       w, h, cx, halfW, boardTop, boardBottom, boardH, backScale, unit,
       horizon: h * (portrait ? 0.30 : 0.24),
-      pieceR: unit * 0.30,
+      pieceR: unit * 0.29,
     };
 
     // Precompute chalk wobble
