@@ -27,21 +27,26 @@
     [315, 610],  // 11 (12) bottom-left
     [450, 610],  // 12 (13) bottom-center
     [585, 610],  // 13 (14) bottom-right
-    [90, 210],   // 14 (15) TL tip a
-    [90, 300],   // 15 (16) TL tip b
-    [775, 150],  // 16 (17) TR tip a
-    [830, 200],  // 17 (18) TR tip b
-    [830, 390],  // 18 (19) MR tip a
-    [830, 470],  // 19 (20) MR tip b
-    [95, 500],   // 20 (21) BL tip a
-    [150, 560],  // 21 (22) BL tip b
+    // Corner triangle tips — spread apart and pulled in from the
+    // extreme edges so they never overlap or crowd the screen border.
+    [110, 180],  // 14 (15) TL tip a
+    [110, 290],  // 15 (16) TL tip b
+    [790, 180],  // 16 (17) TR tip a
+    [790, 290],  // 17 (18) TR tip b
+    [790, 390],  // 18 (19) MR tip a
+    [790, 500],  // 19 (20) MR tip b
+    [110, 390],  // 20 (21) BL tip a
+    [110, 500],  // 21 (22) BL tip b
   ];
   const COUNT = PX.length; // 22
 
-  // Normalize so the board keeps its true proportions. X spans
-  // 90..830 (740 wide), Y spans 90..610 (520 tall). Divide each axis
-  // to 0..1; render re-applies ASPECT so nothing gets stretched.
-  const MINX = 90, MAXX = 830, MINY = 90, MAXY = 610;
+  // Normalize so the board keeps its true proportions. Bounds are
+  // derived from the points; divide each axis to 0..1 and let the
+  // renderer re-apply ASPECT so nothing gets stretched.
+  const MINX = Math.min(...PX.map((p) => p[0]));
+  const MAXX = Math.max(...PX.map((p) => p[0]));
+  const MINY = Math.min(...PX.map((p) => p[1]));
+  const MAXY = Math.max(...PX.map((p) => p[1]));
   const SPANX = MAXX - MINX, SPANY = MAXY - MINY;
   const ASPECT = SPANY / SPANX; // board height / width
 

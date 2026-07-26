@@ -42,7 +42,7 @@
     layout = {
       w, h, cx, halfW, boardTop, boardBottom, boardH, backScale, unit,
       horizon: h * (portrait ? 0.30 : 0.24),
-      pieceR: unit * 0.34,
+      pieceR: unit * 0.30,
     };
 
     // Precompute chalk wobble
@@ -105,30 +105,59 @@
     const rad = Math.min(rw, rh) * 0.09;
 
     ctx.save();
-    // drop shadow onto the ground
-    ctx.fillStyle = 'rgba(0,0,0,.4)';
-    roundRect(ctx, x0 + 10, y0 + 18, rw, rh, rad); ctx.fill();
+    // soft contact shadow of the slab on the table
+    ctx.save();
+    ctx.filter = 'blur(6px)';
+    ctx.fillStyle = 'rgba(0,0,0,.5)';
+    roundRect(ctx, x0 + 6, y0 + 16, rw, rh, rad); ctx.fill();
+    ctx.restore();
+
     // slate body
     const g = ctx.createLinearGradient(0, y0, 0, y0 + rh);
-    g.addColorStop(0, '#454c56'); g.addColorStop(0.5, '#2c323a'); g.addColorStop(1, '#191d23');
+    g.addColorStop(0, '#484f5a'); g.addColorStop(0.5, '#2d333c'); g.addColorStop(1, '#171b21');
     ctx.fillStyle = g;
     roundRect(ctx, x0, y0, rw, rh, rad); ctx.fill();
-    // marble veins
+
     ctx.save();
     roundRect(ctx, x0, y0, rw, rh, rad); ctx.clip();
-    ctx.globalAlpha = 0.07; ctx.strokeStyle = '#cfd8e2'; ctx.lineWidth = 2; ctx.lineCap = 'round';
-    for (let k = 0; k < 6; k++) {
-      const yy = y0 + rh * (k + 0.5) / 6;
-      ctx.beginPath();
-      ctx.moveTo(x0, yy + Math.sin(k * 1.7) * 12);
-      ctx.bezierCurveTo(x0 + rw * 0.33, yy - 16, x0 + rw * 0.66, yy + 16, x0 + rw, yy + Math.cos(k) * 12);
+
+    // fine stone speckle / grain
+    for (let i = 0; i < 900; i++) {
+      const px = x0 + rand(i * 1.7) * rw;
+      const py = y0 + rand(i * 2.3 + 5) * rh;
+      const t = rand(i * 3.1 + 9);
+      ctx.globalAlpha = 0.03 + t * 0.06;
+      ctx.fillStyle = t > 0.5 ? '#aeb8c4' : '#0d1014';
+      const sz = 0.6 + t * 1.8;
+      ctx.beginPath(); ctx.ellipse(px, py, sz, sz * 0.7, t * 6, 0, 7); ctx.fill();
+    }
+    // cleaved layer bands (slate splits in sheets)
+    ctx.globalAlpha = 0.05; ctx.strokeStyle = '#c3ccd6'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+    for (let k = 0; k < 7; k++) {
+      const yy = y0 + rh * (k + 0.5) / 7;
+      ctx.beginPath(); ctx.moveTo(x0, yy + Math.sin(k * 1.7) * 10);
+      ctx.bezierCurveTo(x0 + rw * 0.33, yy - 14, x0 + rw * 0.66, yy + 14, x0 + rw, yy + Math.cos(k) * 10);
       ctx.stroke();
     }
+    // a couple of hairline cracks
+    ctx.globalAlpha = 0.28; ctx.strokeStyle = '#0b0e12'; ctx.lineWidth = 1.4;
+    for (let k = 0; k < 3; k++) {
+      let cx = x0 + rand(k * 12 + 3) * rw, cy = y0 + rand(k * 7 + 1) * rh;
+      ctx.beginPath(); ctx.moveTo(cx, cy);
+      for (let s = 0; s < 5; s++) { cx += (rand(k * 5 + s) - 0.5) * rw * 0.18; cy += (rand(k * 9 + s) - 0.4) * rh * 0.16; ctx.lineTo(cx, cy); }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    // top sheen from the overhead light
+    const sheen = ctx.createLinearGradient(0, y0, 0, y0 + rh * 0.5);
+    sheen.addColorStop(0, 'rgba(255,255,255,.07)'); sheen.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sheen; ctx.fillRect(x0, y0, rw, rh * 0.5);
     ctx.restore();
+
     // bevel: bright top edge, dark bottom edge
-    ctx.strokeStyle = 'rgba(255,255,255,.13)'; ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 3;
     roundRect(ctx, x0 + 2, y0 + 2, rw - 4, rh - 4, rad); ctx.stroke();
-    ctx.strokeStyle = 'rgba(0,0,0,.55)'; ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 2.5;
     roundRect(ctx, x0, y0, rw, rh, rad); ctx.stroke();
     ctx.restore();
   }
@@ -136,35 +165,44 @@
   function drawBoard(ctx, view) {
     drawSlate(ctx);
 
-    // chalk lines
+    // lines carved (engraved) into the slate and filled with a pale
+    // mineral inlay: dark recessed groove + lit top lip + inlay core.
     ctx.save();
     ctx.lineCap = 'round';
+    const dpt = layout.unit * 0.04; // carved depth in px
+    // pass 0: dark recess (offset slightly down)
+    // pass 1: bright top lip (offset slightly up)
+    // pass 2: pale inlay core (centred)
+    const passes = [
+      { yoff: dpt, color: 'rgba(0,0,0,.5)', wmul: 0.14 },
+      { yoff: -dpt, color: 'rgba(190,200,212,.28)', wmul: 0.11 },
+      { yoff: 0, color: 'rgba(222,230,238,.92)', wmul: 0.075 },
+    ];
     for (let i = 0; i < B.EDGES.length; i++) {
       const [a, b] = B.EDGES[i];
       const pa = nodeScreen(a), pb = nodeScreen(b);
       const w = edgeWobble[i];
-      const jitter = layout.unit * 0.04;
-      // double stroke: dark groove then bright cool-white chalk
-      for (let pass = 0; pass < 2; pass++) {
+      const jitter = layout.unit * 0.03;
+      for (const ps of passes) {
         ctx.beginPath();
         for (let k = 0; k <= 6; k++) {
           const tt = k / 6;
           const x = pa.x + (pb.x - pa.x) * tt + w[k][0] * jitter;
-          const y = pa.y + (pb.y - pa.y) * tt + w[k][1] * jitter;
+          const y = pa.y + (pb.y - pa.y) * tt + w[k][1] * jitter + ps.yoff;
           if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
-        if (pass === 0) { ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = layout.unit * 0.13; }
-        else { ctx.strokeStyle = 'rgba(236,242,248,.95)'; ctx.lineWidth = layout.unit * 0.07; }
+        ctx.strokeStyle = ps.color; ctx.lineWidth = layout.unit * ps.wmul;
         ctx.stroke();
       }
     }
-    // node marks
+    // node marks — small carved dimples with a pale inlaid dot
     for (let i = 0; i < B.COUNT; i++) {
       const p = nodeScreen(i);
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(236,242,248,.92)';
-      ctx.arc(p.x, p.y, layout.unit * 0.055 * p.s + 1, 0, 7);
-      ctx.fill();
+      const rr0 = layout.unit * 0.06 * p.s + 1;
+      ctx.beginPath(); ctx.fillStyle = 'rgba(0,0,0,.45)';
+      ctx.arc(p.x, p.y + 1, rr0, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.fillStyle = 'rgba(226,233,240,.95)';
+      ctx.arc(p.x, p.y, rr0 * 0.8, 0, 7); ctx.fill();
     }
     ctx.restore();
 
@@ -198,85 +236,105 @@
   }
 
   /* ---------------- pieces ---------------- */
-  function drawShadow(ctx, x, y, r, s) {
+  // Contact shadow: a tight dark core (ambient occlusion where the
+  // stone meets the board) plus a soft cast shadow to the lower-right.
+  function drawShadow(ctx, x, y, r, lift) {
     ctx.save();
-    const g = ctx.createRadialGradient(x, y, 0, x, y, r * 1.6);
-    g.addColorStop(0, 'rgba(30,18,6,.42)');
-    g.addColorStop(1, 'rgba(30,18,6,0)');
+    const off = (lift || 0) * 0.5;
+    // soft cast shadow (further when the piece is lifted)
+    const g = ctx.createRadialGradient(x, y + r * 0.5, 0, x, y + r * 0.5, r * 1.7);
+    g.addColorStop(0, `rgba(10,8,4,${0.4 - Math.min(0.25, off / (r * 8))})`);
+    g.addColorStop(1, 'rgba(10,8,4,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.ellipse(x + r * 0.18, y + r * 0.55, r * 1.35, r * 0.72, 0, 0, 7);
+    ctx.ellipse(x + r * 0.22 + off * 0.4, y + r * 0.58 + off, r * (1.35 + off / r), r * 0.66, 0, 0, 7);
     ctx.fill();
+    // tight contact core (only when resting)
+    if (off < r * 0.6) {
+      ctx.globalAlpha = 0.5 * (1 - off / (r * 0.6));
+      const gc = ctx.createRadialGradient(x, y + r * 0.72, 0, x, y + r * 0.72, r * 0.8);
+      gc.addColorStop(0, 'rgba(0,0,0,.7)'); gc.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gc;
+      ctx.beginPath(); ctx.ellipse(x, y + r * 0.72, r * 0.8, r * 0.34, 0, 0, 7); ctx.fill();
+    }
     ctx.restore();
   }
 
+  // Smooth polished river pebble: pale grey stone, top-lit, with a
+  // crisp specular glint and a darker rim (form shadow).
   function drawGoat(ctx, x, y, r, seed, lift) {
     const R = r * seed.size;
-    drawShadow(ctx, x, y + (lift || 0) * 0.4, R, 1);
+    drawShadow(ctx, x, y, R, lift);
     ctx.save();
     ctx.translate(x, y - (lift || 0));
     ctx.rotate(seed.rot);
-    ctx.scale(1, seed.squash);
-    const g = ctx.createRadialGradient(-R * 0.35, -R * 0.4, R * 0.1, 0, 0, R * 1.1);
-    const cool = 6 * seed.tint;
-    g.addColorStop(0, '#ffffff');
-    g.addColorStop(0.55, `rgb(${223 - cool},${230 - cool},${236 - cool})`);
-    g.addColorStop(1, `rgb(${166 - cool},${178 - cool},${189 - cool})`);
+    ctx.scale(1, seed.squash * 0.96);
+    const cool = 8 * seed.tint;
+    const g = ctx.createRadialGradient(-R * 0.34, -R * 0.42, R * 0.05, R * 0.1, R * 0.15, R * 1.2);
+    g.addColorStop(0, '#fdfefe');
+    g.addColorStop(0.45, `rgb(${226 - cool},${231 - cool},${236 - cool})`);
+    g.addColorStop(0.82, `rgb(${182 - cool},${190 - cool},${199 - cool})`);
+    g.addColorStop(1, `rgb(${120 - cool},${130 - cool},${140 - cool})`);
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
-    // subtle speckles + top gloss
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = 'rgba(255,255,255,.9)';
-    ctx.beginPath(); ctx.ellipse(-R * 0.32, -R * 0.42, R * 0.34, R * 0.2, -0.5, 0, 7); ctx.fill();
-    ctx.globalAlpha = 0.16;
-    ctx.fillStyle = '#5c6672';
-    for (let k = 0; k < 3; k++) {
-      const a = seed.tint * 6 + k * 2.1;
-      ctx.beginPath();
-      ctx.arc(Math.cos(a) * R * 0.4, Math.sin(a) * R * 0.4, R * 0.08, 0, 7); ctx.fill();
+    // faint mineral mottling
+    ctx.globalAlpha = 0.10; ctx.fillStyle = '#5c6672';
+    for (let k = 0; k < 4; k++) {
+      const a = seed.tint * 6 + k * 1.7;
+      ctx.beginPath(); ctx.ellipse(Math.cos(a) * R * 0.42, Math.sin(a) * R * 0.42, R * 0.13, R * 0.08, a, 0, 7); ctx.fill();
     }
+    // dark form-shadow rim (lower-right)
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = R * 0.10; ctx.strokeStyle = 'rgba(70,80,92,.35)';
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.94, 0.15 * Math.PI, 0.95 * Math.PI); ctx.stroke();
+    // broad soft sheen + tight specular glint
+    ctx.globalAlpha = 0.55; ctx.fillStyle = 'rgba(255,255,255,.9)';
+    ctx.beginPath(); ctx.ellipse(-R * 0.34, -R * 0.4, R * 0.36, R * 0.22, -0.5, 0, 7); ctx.fill();
+    ctx.globalAlpha = 0.95; ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.ellipse(-R * 0.4, -R * 0.46, R * 0.12, R * 0.07, -0.5, 0, 7); ctx.fill();
     ctx.restore();
   }
 
+  // Polished tiger-eye cabochon: warm amber-brown with chatoyant
+  // golden bands and a glossy highlight.
   function drawTiger(ctx, x, y, r, seed, lift) {
-    const R = r * 1.42; // tigers are the bigger, premium stones
-    drawShadow(ctx, x, y + (lift || 0) * 0.4, R, 1);
+    const R = r * 1.26; // tigers are the bigger, premium stones
+    drawShadow(ctx, x, y, R, lift);
     ctx.save();
     ctx.translate(x, y - (lift || 0));
     ctx.rotate(seed.rot * 0.5);
-    ctx.scale(1, 0.84);
-    const g = ctx.createRadialGradient(-R * 0.4, -R * 0.5, R * 0.1, 0, 0, R * 1.15);
-    g.addColorStop(0, '#ffc85f');
-    g.addColorStop(0.5, '#e17c1d');
-    g.addColorStop(1, '#8a4408');
+    ctx.scale(1, 0.9);
+    const g = ctx.createRadialGradient(-R * 0.36, -R * 0.46, R * 0.05, R * 0.1, R * 0.12, R * 1.2);
+    g.addColorStop(0, '#ffd27a');
+    g.addColorStop(0.4, '#d98a2f');
+    g.addColorStop(0.78, '#8a4a12');
+    g.addColorStop(1, '#3f1f06');
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(0, 0, R, 0, 7); ctx.fill();
 
-    // engraved tiger stripes (carved grooves)
+    // chatoyant tiger-eye bands (fine golden fibres) angled across
     ctx.save();
-    ctx.beginPath(); ctx.arc(0, 0, R * 0.96, 0, 7); ctx.clip();
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.97, 0, 7); ctx.clip();
+    ctx.rotate(-0.5 + seed.tint * 0.6);
     ctx.lineCap = 'round';
-    for (let k = -2; k <= 2; k++) {
-      const off = k * R * 0.34;
-      // dark groove
-      ctx.strokeStyle = 'rgba(90,38,0,.6)'; ctx.lineWidth = R * 0.13;
-      ctx.beginPath();
-      ctx.moveTo(off - R * 0.1, -R);
-      ctx.quadraticCurveTo(off + R * 0.28, 0, off - R * 0.1, R);
-      ctx.stroke();
-      // bright highlight edge of the groove
-      ctx.strokeStyle = 'rgba(255,224,150,.4)'; ctx.lineWidth = R * 0.05;
-      ctx.beginPath();
-      ctx.moveTo(off - R * 0.02, -R);
-      ctx.quadraticCurveTo(off + R * 0.36, 0, off - R * 0.02, R);
-      ctx.stroke();
+    for (let k = -5; k <= 5; k++) {
+      const off = k * R * 0.16;
+      const bright = 0.12 + 0.16 * (1 - Math.abs(k) / 6);
+      ctx.strokeStyle = `rgba(255,214,120,${bright})`;
+      ctx.lineWidth = R * 0.05;
+      ctx.beginPath(); ctx.moveTo(off, -R * 1.1); ctx.lineTo(off + R * 0.12, R * 1.1); ctx.stroke();
+      ctx.strokeStyle = 'rgba(60,26,4,.18)'; ctx.lineWidth = R * 0.03;
+      ctx.beginPath(); ctx.moveTo(off + R * 0.09, -R * 1.1); ctx.lineTo(off + R * 0.21, R * 1.1); ctx.stroke();
     }
     ctx.restore();
 
-    // polished gloss
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = 'rgba(255,245,220,.95)';
-    ctx.beginPath(); ctx.ellipse(-R * 0.38, -R * 0.46, R * 0.34, R * 0.16, -0.5, 0, 7); ctx.fill();
+    // dark form-shadow rim + glossy specular
+    ctx.lineWidth = R * 0.10; ctx.strokeStyle = 'rgba(50,22,4,.4)';
+    ctx.beginPath(); ctx.arc(0, 0, R * 0.93, 0.12 * Math.PI, 0.96 * Math.PI); ctx.stroke();
+    ctx.globalAlpha = 0.5; ctx.fillStyle = 'rgba(255,246,220,.95)';
+    ctx.beginPath(); ctx.ellipse(-R * 0.36, -R * 0.44, R * 0.34, R * 0.17, -0.5, 0, 7); ctx.fill();
+    ctx.globalAlpha = 0.95; ctx.fillStyle = '#fffaf0';
+    ctx.beginPath(); ctx.ellipse(-R * 0.42, -R * 0.5, R * 0.12, R * 0.07, -0.5, 0, 7); ctx.fill();
     ctx.restore();
   }
 
